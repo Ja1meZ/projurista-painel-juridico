@@ -1,0 +1,30 @@
+{
+  "_comentario": "Exemplo fictício. Copie para receita.json e troque os seletores pelos da sua ferramenta (o retrato feito por reconhecer.py mostra quais são).",
+  "logado": {"seletor": "#menu-principal", "url_nao_contem": "/login"},
+  "login": {"usuario": "#usuario", "senha": "#senha", "entrar": "#entrar"},
+  "quadro": null,
+  "passos_iniciais": [
+    {"ir": "/painel"},
+    {"esperar": "ul.tarefas li"}
+  ],
+  "pastas": {
+    "seletor": "ul.tarefas li",
+    "nome": {"seletor": "a"},
+    "quantidade": {"seletor": ".contador"},
+    "clicar_no_link": true,
+    "voltar": [{"ir": "/painel"}, {"esperar": "ul.tarefas li"}]
+  },
+  "lista": {
+    "esperar": "table.processos tbody tr",
+    "linha": "table.processos tbody tr",
+    "identificador": {"seletor": "td.numero"},
+    "campos": {
+      "classe": {"seletor": "td.classe"},
+      "assunto": {"seletor": "td.assunto"},
+      "partes": {"seletor": "td.partes"},
+      "dias_na_tarefa": {"seletor": "td.dias", "regex": "(\\d+)"}
+    },
+    "total": {"seletor": ".total-registros", "regex": "(\\d+)"}
+  },
+  "paginacao": {"proximo": "a.proxima", "pausa": 1}
+}

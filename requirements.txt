@@ -1,0 +1,4 @@
+playwright==1.60.0
+pypdf>=4.0
+keyring>=24
+send2trash>=1.8

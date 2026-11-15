@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel Jurídico</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect x=%272%27 y=%274%27 width=%278%27 height=%2724%27 rx=%272%27 fill=%27%232f6fde%27/%3E%3Crect x=%2712%27 y=%274%27 width=%278%27 height=%2716%27 rx=%272%27 fill=%27%236b9cf2%27/%3E%3Crect x=%2722%27 y=%274%27 width=%278%27 height=%2710%27 rx=%272%27 fill=%27%23b3c9f5%27/%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #f4f5f7; --surface: #ffffff; --surface-2: #eef0f3; --border: #d9dde3;
+  --text: #1c2128; --muted: #5c6670; --accent: #2f6fde; --accent-soft: #e4edfb;
+  --danger: #c8322b; --danger-soft: #fbe7e5; --warn: #b26a00; --warn-soft: #fff1d6;
+  --ok: #1f7a3a; --ok-soft: #e0f3e6; --purple: #6b48c9; --purple-soft: #ece6fa;
+  --shadow: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.1);
+  --radius: 10px; --mono: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121417; --surface: #1b1f24; --surface-2: #242a31; --border: #313841;
+  --text: #e6e9ed; --muted: #98a2ad; --accent: #6b9cf2; --accent-soft: #1d2d4a;
+  --danger: #f07a73; --danger-soft: #3d1f1d; --warn: #f0b24f; --warn-soft: #3b2d12;
+  --ok: #5fcf85; --ok-soft: #163322; --purple: #b39af5; --purple-soft: #2b2244;
+  --shadow: 0 1px 2px rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"] {
+  --bg: #121417; --surface: #1b1f24; --surface-2: #242a31; --border: #313841;
+  --text: #e6e9ed; --muted: #98a2ad; --accent: #6b9cf2; --accent-soft: #1d2d4a;
+  --danger: #f07a73; --danger-soft: #3d1f1d; --warn: #f0b24f; --warn-soft: #3b2d12;
+  --ok: #5fcf85; --ok-soft: #163322; --purple: #b39af5; --purple-soft: #2b2244;
+  --shadow: 0 1px 2px rgba(0,0,0,.5);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); font: 14px/1.4 var(--sans); display: flex; flex-direction: column; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+header h1 { font-size: 17px; margin: 0; letter-spacing: -.01em; }
+header h1 small { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 8px; }
+.stats { display: flex; gap: 6px; flex-wrap: wrap; }
+.stat { background: var(--surface-2); border-radius: 999px; padding: 3px 10px; font-size: 12px; color: var(--muted); }
+.stat b { color: var(--text); font-variant-numeric: tabular-nums; }
+.controles { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-left: auto; }
+.controles input[type="search"] { width: 240px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
+.botao { border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 5px 10px; color: var(--text); }
+.botao.ativo { background: var(--danger-soft); color: var(--danger); border-color: transparent; font-weight: 600; }
+.botao:disabled { opacity: .55; cursor: default; }
+.botao.azul { color: var(--accent); border-color: var(--accent); font-weight: 600; }
+.botao.azul:hover:not(:disabled) { background: var(--accent-soft); }
+.botao.verde { color: var(--ok); border-color: var(--ok); font-weight: 600; }
+.botao.verde:hover:not(:disabled) { background: var(--ok-soft); }
+.botao b.n { background: var(--ok); color: #fff; border-radius: 999px; padding: 0 6px; font-size: 11px; margin-left: 6px; }
+.botao b.n:empty { display: none; }
+.status { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; }
+.status i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); display: inline-block; }
+.status.falha i { background: var(--danger); }
+.linha-larga { width: 100%; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 12px; }
+.linha-larga:empty { display: none; }
+.avisos { color: var(--warn); }
+.rotulo { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface); padding: 5px 10px; color: var(--muted); white-space: nowrap; }
+.seg button.ativo { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.seg button small { margin-left: 4px; opacity: .7; }
+.job { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+.job.executando { background: var(--accent-soft); color: var(--accent); }
+.job.falhou { background: var(--danger-soft); color: var(--danger); }
+.job.concluido { background: var(--ok-soft); color: var(--ok); }
+.job.parcial { background: var(--warn-soft); color: var(--warn); }
+.job button { border: 0; background: transparent; color: inherit; padding: 0 2px; text-decoration: underline; font-size: 11.5px; }
+
+main { flex: 1; overflow-x: auto; overflow-y: hidden; padding: 12px 16px 16px; }
+.quadro { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(270px, 1fr); gap: 12px; height: 100%; }
+.coluna { display: flex; flex-direction: column; min-height: 0; background: var(--surface-2); border-radius: var(--radius); border: 1px solid var(--border); }
+.coluna.fila { border-color: var(--accent); }
+.coluna > h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; margin: 0; padding: 10px 12px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+.coluna > h2 span { background: var(--surface); border-radius: 999px; padding: 1px 8px; font-size: 12px; color: var(--text); }
+.subcab { padding: 0 12px 8px; font-size: 11.5px; color: var(--muted); }
+.subcab.parcial { color: var(--warn); }
+.lista { flex: 1; overflow-y: auto; padding: 0 8px 8px; display: flex; flex-direction: column; gap: 8px; }
+.vazio { color: var(--muted); font-size: 12px; text-align: center; padding: 24px 8px; }
+.cartao { background: var(--surface); border-radius: 8px; box-shadow: var(--shadow); padding: 10px 10px 8px; border-left: 4px solid transparent; }
+.cartao.pendente { border-left-color: var(--danger); }
+.cartao.pedido { border-left-color: var(--purple); }
+.linha { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; margin-bottom: 5px; }
+.numero { font-family: var(--mono); font-size: 13px; font-weight: 600; cursor: copy; border-bottom: 1px dotted var(--border); overflow-wrap: anywhere; }
+.numero:hover { color: var(--accent); }
+.chip { font-size: 11px; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+.chip.pasta { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.chip.tag { background: var(--purple-soft); color: var(--purple); }
+.campos { font-size: 12px; color: var(--muted); display: grid; grid-template-columns: auto 1fr; gap: 1px 8px; margin-bottom: 6px; }
+.campos dt { font-weight: 600; } .campos dd { margin: 0; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.badges { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+.badge { font-size: 10.5px; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border); color: var(--muted); }
+.badge.verde { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.badge.roxo { background: var(--purple-soft); color: var(--purple); border-color: transparent; font-weight: 600; }
+.badge.laranja { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.badge button { border: 0; background: transparent; color: inherit; padding: 0 0 0 4px; font-size: 11px; }
+.pendencia { background: var(--danger-soft); color: var(--danger); border-radius: 6px; padding: 5px 8px; font-size: 12px; margin-bottom: 6px; }
+.obs { font-size: 12px; color: var(--muted); margin-bottom: 6px; white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.alerta { color: var(--warn); font-size: 11.5px; margin-bottom: 4px; }
+.rodape { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+.rodape .tempo { flex: 1 1 100%; margin-bottom: 2px; }
+.rodape button { border: 0; background: transparent; color: var(--muted); padding: 2px 6px; border-radius: 5px; font-size: 11.5px; }
+.rodape button:hover { background: var(--surface-2); color: var(--text); }
+.rodape button.forte { color: var(--accent); font-weight: 600; }
+.rodape button.ok { color: var(--ok); font-weight: 600; }
+.rodape button.perigo:hover { background: var(--danger-soft); color: var(--danger); }
+.modal-fundo { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 20; }
+.modal { background: var(--surface); border-radius: 12px; padding: 18px 20px; max-width: 520px; width: calc(100% - 32px); max-height: 92vh; overflow: auto; box-shadow: 0 12px 40px rgba(0,0,0,.3); }
+.modal h3 { margin: 0 0 8px; font-size: 15px; }
+.modal p { margin: 0 0 12px; color: var(--muted); }
+.modal label { display: grid; gap: 3px; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.modal input[type="text"], .modal select, .modal textarea { padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); width: 100%; color: var(--text); }
+.modal textarea { min-height: 84px; resize: vertical; }
+.modal .check { display: flex; align-items: center; gap: 6px; color: var(--text); font-size: 13px; }
+.modal .acoes { display: flex; gap: 8px; justify-content: flex-end; }
+.modal .acoes button { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); }
+.modal .acoes button.primario { background: var(--accent); color: #fff; border-color: transparent; }
+.modal .acoes button.perigo { background: var(--danger); color: #fff; border-color: transparent; }
+.modal pre { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-family: var(--mono); font-size: 12px; white-space: pre-wrap; max-height: 55vh; overflow: auto; user-select: all; margin: 0 0 12px; }
+.toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 999px; font-size: 13px; z-index: 30; }
+.toast.erro { background: var(--danger); color: #fff; }
+@media (max-width: 720px) { .quadro { grid-auto-flow: row; grid-auto-columns: auto; } main { overflow-y: auto; } .coluna { max-height: 70vh; } .controles input[type="search"] { width: 100%; } }
+</style>
+</head>
+<body>
+<header>
+  <h1><span id="titulo">Painel Jurídico</span><small id="raiz"></small></h1>
+  <div class="stats" id="stats"></div>
+  <div class="controles">
+    <input type="search" id="busca" placeholder="Buscar número, parte, assunto, tag…" autocomplete="off">
+    <button class="botao" id="soPendencias" title="Mostrar só processos com pendência">Só pendências</button>
+    <button class="botao verde" id="processar" title="Abre o terminal com o Claude Code para cumprir os pedidos de rascunho">Processar pedidos<b class="n"></b></button>
+    <button class="botao azul" id="atualizar" title="Lê de novo a fila na sua ferramenta (abre o navegador; pode pedir login)">Atualizar fila</button>
+    <button class="botao" id="tema" title="Alternar tema claro e escuro">◐</button>
+    <span class="status" id="status"><i></i><span>conectando…</span></span>
+  </div>
+  <div class="linha-larga" id="filtros"></div>
+  <div class="linha-larga" id="jobs"></div>
+  <div class="linha-larga avisos" id="avisos"></div>
+</header>
+<main><div class="quadro" id="quadro"></div></main>
+<script>
+(function () {
+  "use strict";
+  var estado = null, etag = null, filtroPasta = "", soPend = false, termo = "";
+  var ROTULOS = { classe: "Classe", assunto: "Assunto", partes: "Partes", orgao: "Órgão", etiquetas: "Etiquetas",
+    prioridade: "Prioridade", dias_na_tarefa: "Dias na tarefa", data_chegada: "Chegada",
+    ultima_movimentacao: "Última movimentação", sigilo: "Sigilo" };
+  var STATUS = { pendente: "pedido", em_andamento: "em elaboração", concluido: "pronto", cancelado: "cancelado" };
+
+  function h(tag, attrs, filhos) {
+    var el = document.createElement(tag), k;
+    for (k in (attrs || {})) {
+      if (k === "class") el.className = attrs[k];
+      else if (k === "text") el.textContent = attrs[k];
+      else if (k.indexOf("on") === 0) el.addEventListener(k.slice(2), attrs[k]);
+      else if (attrs[k] !== false && attrs[k] != null) el.setAttribute(k, attrs[k]);
+    }
+    (filhos || []).forEach(function (f) { if (f) el.appendChild(typeof f === "string" ? document.createTextNode(f) : f); });
+    return el;
+  }
+  function $(id) { return document.getElementById(id); }
+  function toast(msg, erro) {
+    var t = h("div", { class: "toast" + (erro ? " erro" : ""), text: msg });
+    document.body.appendChild(t);
+    setTimeout(function () { t.remove(); }, erro ? 6000 : 2600);
+  }
+  function api(rota, corpo) {
+    return fetch(rota, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo || {}) })
+      .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.erro || "falha"); return d; }); });
+  }
+  function agir(rota, corpo, okMsg) {
+    return api(rota, corpo).then(function (d) { if (okMsg) toast(okMsg); carregar(true); return d; })
+      .catch(function (e) { toast(e.message, true); });
+  }
+  function tempo(ts) {
+    if (!ts) return "";
+    var s = Math.max(0, Date.now() / 1000 - ts), u = [[86400, "d"], [3600, "h"], [60, "min"]];
+    for (var i = 0; i < u.length; i++) if (s >= u[i][0]) return "há " + Math.floor(s / u[i][0]) + " " + u[i][1];
+    return "agora";
+  }
+  function valor(v) { return Array.isArray(v) ? v.join(", ") : (v === true ? "sim" : v === false ? "não" : String(v)); }
+  function nomePasta(id) {
+    var p = (estado.config.pastas_tarefa || []).filter(function (x) { return x.id === id; })[0];
+    return p ? p.nome : id;
+  }
+  function nomePeca(id) {
+    var p = (estado.config.pecas || []).filter(function (x) { return x.id === id; })[0];
+    return p ? p.nome : id;
+  }
+  function casa(item) {
+    if (filtroPasta && (item.pastas_tarefa || []).indexOf(filtroPasta) < 0) return false;
+    if (soPend && !item.pendencia) return false;
+    if (!termo) return true;
+    var palheiro = [item.identificador, item.pasta, item.pendencia, item.observacoes, (item.tags || []).join(" "),
+      Object.keys(item.campos || {}).map(function (k) { return valor(item.campos[k]); }).join(" ")].join(" ").toLowerCase();
+    return palheiro.indexOf(termo) >= 0;
+  }
+
+  // ---------------------------------------------------------------- modais
+  function modal(titulo, corpo, botoes) {
+    var fundo = h("div", { class: "modal-fundo" });
+    function fechar() { fundo.remove(); }
+    var acoes = h("div", { class: "acoes" }, [h("button", { text: "Fechar", onclick: fechar })].concat(
+      (botoes || []).map(function (b) {
+        return h("button", { class: b.classe || "primario", text: b.texto, onclick: function () { if (b.acao() !== false) fechar(); } });
+      })));
+    fundo.appendChild(h("div", { class: "modal" }, [h("h3", { text: titulo })].concat(corpo).concat([acoes])));
+    fundo.addEventListener("mousedown", function (e) { if (e.target === fundo) fechar(); });
+    document.body.appendChild(fundo);
+    var foco = fundo.querySelector("textarea, input, select"); if (foco) foco.focus();
+    return fechar;
+  }
+  function modalAnotar(p) {
+    var pend = h("input", { type: "text", value: p.pendencia || "", placeholder: "Ex.: aguardar juntada de documento" });
+    var tags = h("input", { type: "text", value: (p.tags || []).join(", "), placeholder: "separadas por vírgula" });
+    var obs = h("textarea", {}); obs.value = p.observacoes || "";
+    modal("Anotar — " + p.identificador, [
+      h("label", {}, ["Pendência (deixa o cartão em destaque; vazio = sem pendência)", pend]),
+      h("label", {}, ["Tags", tags]),
+      h("label", {}, ["Observações (entram no contexto dos pedidos de rascunho)", obs])
+    ], [{ texto: "Salvar", acao: function () {
+      agir("/api/anotar", { pasta: p.pasta, pendencia: pend.value, observacoes: obs.value,
+        tags: tags.value.split(",").map(function (t) { return t.trim(); }).filter(Boolean) }, "Anotação salva");
+    } }]);
+  }
+  function modalPedir(p) {
+    var pecas = estado.config.pecas || [];
+    if (!pecas.length) return toast("Nenhuma peça configurada. Rode /painel-criar no Claude Code.", true);
+    var sel = h("select", {}, pecas.map(function (x) {
+      return h("option", { value: x.id, text: x.nome + (p.pecas.indexOf(x.id) >= 0 ? " (já existe: será revista)" : "") });
+    }));
+    var ori = h("textarea", { placeholder: "O que você quer nesta peça: sentido, pontos a enfrentar, modelo a seguir…" });
+    modal("Pedir rascunho — " + p.identificador, [
+      h("p", { text: "O pedido fica registrado no cartão. Quem redige é o Claude Code, quando você clicar em “Processar pedidos”. O resultado é um rascunho para a sua conferência." }),
+      h("label", {}, ["Peça", sel]), h("label", {}, ["Orientação", ori])
+    ], [{ texto: "Registrar pedido", acao: function () {
+      agir("/api/pedido", { pasta: p.pasta, peca: sel.value, orientacao: ori.value }, "Pedido registrado");
+    } }]);
+  }
+  function modalLixeira(p) {
+    modal("Enviar à Lixeira?", [h("p", { text: "A pasta " + p.pasta + " vai para a Lixeira do sistema, com os autos e as minutas. Dá para recuperar pela própria Lixeira." })],
+      [{ texto: "Enviar à Lixeira", classe: "perigo", acao: function () { agir("/api/lixeira", { pasta: p.pasta }, "Pasta enviada à Lixeira"); } }]);
+  }
+  function modalLog(job) {
+    fetch("/api/jobs/" + job.id + "/log").then(function (r) { return r.text(); }).then(function (t) {
+      modal("Registro da tarefa", [h("pre", { text: t || "(vazio)" })]);
+    });
+  }
+
+  // ---------------------------------------------------------------- cartões
+  function linhaCampos(campos) {
+    var mostrar = (estado.config.campos_cartao || []).filter(function (k) { return campos && campos[k] != null && campos[k] !== ""; });
+    if (!mostrar.length) return null;
+    var dl = h("dl", { class: "campos" });
+    mostrar.forEach(function (k) {
+      dl.appendChild(h("dt", { text: ROTULOS[k] || k }));
+      dl.appendChild(h("dd", { text: valor(campos[k]), title: valor(campos[k]) }));
+    });
+    return dl;
+  }
+  function numero(texto) {
+    return h("span", { class: "numero", text: texto, title: "Clique para copiar", onclick: function () {
+      (navigator.clipboard ? navigator.clipboard.writeText(texto) : Promise.reject()).then(function () { toast("Copiado"); }, function () {});
+    } });
+  }
+  function chipsPastas(ids) { return (ids || []).map(function (id) { return h("span", { class: "chip pasta", text: nomePasta(id) }); }); }
+
+  function cartaoFila(it) {
+    var botoes = [];
+    if (estado.config.pode_baixar) botoes.push(h("button", { class: "forte", text: "Baixar", onclick: function () {
+      agir("/api/jobs", { tipo: "baixar", alvo: it.identificador }, "Download na fila de tarefas");
+    } }));
+    botoes.push(h("button", { text: "Criar pasta", title: "Cria a pasta do processo para você guardar os arquivos", onclick: function () {
+      agir("/api/criar_pasta", { identificador: it.identificador }, "Pasta criada");
+    } }));
+    return h("div", { class: "cartao" }, [
+      h("div", { class: "linha" }, [numero(it.identificador)].concat(chipsPastas(it.pastas_tarefa))),
+      linhaCampos(it.campos), h("div", { class: "rodape" }, botoes)
+    ]);
+  }
+  function cartao(p) {
+    var ultimaFase = estado.config.fases[estado.config.fases.length - 1].id;
+    var badges = p.pecas.map(function (id) { return h("span", { class: "badge verde", text: nomePeca(id) }); });
+    p.minutas_fora_do_padrao.forEach(function (a) { badges.push(h("span", { class: "badge", text: a, title: "Arquivo em minutas/ fora dos nomes configurados" })); });
+    p.pedidos.filter(function (x) { return x.status === "pendente" || x.status === "em_andamento"; }).forEach(function (x) {
+      badges.push(h("span", { class: "badge " + (x.status === "pendente" ? "roxo" : "laranja"), title: x.orientacao || "" }, [
+        STATUS[x.status] + ": " + nomePeca(x.peca),
+        x.status === "pendente" ? h("button", { text: "×", title: "Cancelar pedido", onclick: function () {
+          agir("/api/pedido", { pasta: p.pasta, acao: "cancelar", id: x.id }, "Pedido cancelado");
+        } }) : null
+      ]));
+    });
+    return h("div", { class: "cartao" + (p.pendencia ? " pendente" : p.pedidos_abertos ? " pedido" : "") }, [
+      h("div", { class: "linha" }, [numero(p.identificador)].concat(chipsPastas(p.pastas_tarefa))
+        .concat((p.tags || []).map(function (t) { return h("span", { class: "chip tag", text: t }); }))),
+      linhaCampos(p.campos),
+      p.pendencia ? h("div", { class: "pendencia", text: p.pendencia }) : null,
+      badges.length ? h("div", { class: "badges" }, badges) : null,
+      p.observacoes ? h("div", { class: "obs", text: p.observacoes, title: p.observacoes }) : null,
+      p.alertas.length ? h("div", { class: "alerta", text: "⚠ " + p.alertas.join("; ") }) : null,
+      h("div", { class: "rodape" }, [
+        h("span", { class: "tempo", text: p.n_arquivos + " arquivo(s) · " + tempo(p.ultima_atividade) }),
+        h("button", { text: "Abrir pasta", onclick: function () { agir("/api/abrir", { pasta: p.pasta }); } }),
+        h("button", { text: "Anotar", onclick: function () { modalAnotar(p); } }),
+        h("button", { class: "forte", text: "Pedir rascunho", onclick: function () { modalPedir(p); } }),
+        p.fase === ultimaFase
+          ? h("button", { text: "Desfazer conferência", onclick: function () { agir("/api/anotar", { pasta: p.pasta, conferida: false }); } })
+          : h("button", { class: "ok", text: "Conferido", title: "Marca como conferido por você", onclick: function () { agir("/api/anotar", { pasta: p.pasta, conferida: true }, "Marcado como conferido"); } }),
+        h("button", { class: "perigo", text: "Lixeira", onclick: function () { modalLixeira(p); } })
+      ])
+    ]);
+  }
+
+  // ---------------------------------------------------------------- quadro
+  function coluna(titulo, itens, fabrica, classe, sub) {
+    var lista = h("div", { class: "lista" }, itens.length ? itens.map(fabrica) : [h("div", { class: "vazio", text: "Nada aqui." })]);
+    return h("section", { class: "coluna " + (classe || "") }, [
+      h("h2", {}, [titulo, h("span", { text: String(itens.length) })]), sub || null, lista]);
+  }
+  function render() {
+    var c = estado.config, fila = estado.fila;
+    $("titulo").textContent = c.titulo; document.title = c.titulo + " — Painel";
+    $("raiz").textContent = c.raiz;
+    var pedidos = 0; estado.processos.forEach(function (p) { pedidos += p.pedidos.filter(function (x) { return x.status === "pendente"; }).length; });
+    $("processar").querySelector(".n").textContent = pedidos || "";
+    $("atualizar").disabled = !c.conector;
+
+    var stats = $("stats"); stats.textContent = "";
+    [["na fila", fila.itens.filter(function (i) { return !i.ja_baixado; }).length], ["em trabalho", estado.processos.length],
+     ["pendências", estado.processos.filter(function (p) { return p.pendencia; }).length]].forEach(function (s) {
+      stats.appendChild(h("span", { class: "stat" }, [h("b", { text: String(s[1]) }), " " + s[0]]));
+    });
+
+    var filtros = $("filtros"); filtros.textContent = "";
+    if ((c.pastas_tarefa || []).length) {
+      var seg = h("span", { class: "seg" }, [h("button", { class: filtroPasta ? "" : "ativo", text: "Todas", onclick: function () { filtroPasta = ""; render(); } })]);
+      c.pastas_tarefa.forEach(function (p) {
+        var n = fila.itens.filter(function (i) { return i.pastas_tarefa.indexOf(p.id) >= 0; }).length;
+        seg.appendChild(h("button", { class: filtroPasta === p.id ? "ativo" : "", onclick: function () { filtroPasta = p.id; render(); } },
+          [p.nome, h("small", { text: String(n) })]));
+      });
+      filtros.appendChild(h("span", { class: "rotulo", text: "Pasta de tarefa" })); filtros.appendChild(seg);
+    }
+
+    var avisos = [];
+    if (c.faltando.length) avisos.push("Configuração incompleta (" + c.faltando.join(", ") + "): rode /painel-criar no Claude Code.");
+    if (!c.raiz_existe) avisos.push("A pasta dos processos ainda não existe: " + c.raiz);
+    fila.erros.forEach(function (e) { avisos.push("Fila: " + e); });
+    $("avisos").textContent = avisos.join(" · ");
+
+    var jobs = $("jobs"); jobs.textContent = "";
+    (estado.jobs || []).slice(-6).forEach(function (j) {
+      var rot = (j.tipo === "listar" ? "Leitura da fila" : "Download " + j.alvo) + " — " +
+        ({ aguardando: "aguardando", executando: "em andamento (olhe a janela do navegador: pode pedir login)", concluido: "concluído", parcial: "parcial", falhou: "falhou", cancelado: "cancelado" })[j.status];
+      var filhos = [rot, h("button", { text: "registro", onclick: function () { modalLog(j); } })];
+      if (j.status === "aguardando" || j.status === "executando") filhos.push(h("button", { text: "cancelar", onclick: function () { agir("/api/jobs/" + j.id + "/cancelar", {}); } }));
+      jobs.appendChild(h("span", { class: "job " + j.status, title: j.mensagem || "" }, filhos));
+    });
+
+    var quadro = $("quadro"); quadro.textContent = "";
+    var sub;
+    if (!fila.existe) sub = h("div", { class: "subcab", text: c.conector ? "Fila ainda não lida. Clique em “Atualizar fila”." : "Sem conector: rode /painel-criar." });
+    else sub = h("div", { class: "subcab" + (fila.manifesto.completo ? "" : " parcial"),
+      text: "Lida " + tempo(Date.now() / 1000 - (fila.idade_s || 0)) + (fila.manifesto.completo ? "" : " · leitura parcial: " + fila.manifesto.total_enumerado + " de " + fila.manifesto.total_esperado) });
+    quadro.appendChild(coluna("Fila", fila.itens.filter(function (i) { return !i.ja_baixado && casa(i); }), cartaoFila, "fila", sub));
+    c.fases.forEach(function (f) {
+      quadro.appendChild(coluna(f.nome, estado.processos.filter(function (p) { return p.fase === f.id && casa(p); })
+        .sort(function (a, b) { return b.ultima_atividade - a.ultima_atividade; }), cartao));
+    });
+  }
+
+  function carregar(forcar) {
+    var cab = {}; if (etag && !forcar) cab["If-None-Match"] = etag;
+    return fetch("/api/estado" + (forcar ? "?forcar=1" : ""), { headers: cab }).then(function (r) {
+      $("status").className = "status"; $("status").lastChild.textContent = "atualizado";
+      if (r.status === 304) return;
+      etag = r.headers.get("ETag");
+      return r.json().then(function (d) { estado = d; if (!document.querySelector(".modal-fundo")) render(); });
+    }).catch(function () { $("status").className = "status falha"; $("status").lastChild.textContent = "painel parado"; });
+  }
+
+  $("busca").addEventListener("input", function (e) { termo = e.target.value.trim().toLowerCase(); if (estado) render(); });
+  $("soPendencias").addEventListener("click", function (e) { soPend = !soPend; e.target.classList.toggle("ativo", soPend); if (estado) render(); });
+  $("atualizar").addEventListener("click", function () { agir("/api/jobs", { tipo: "listar" }, "Leitura da fila iniciada: uma janela do navegador vai abrir"); });
+  $("processar").addEventListener("click", function () {
+    api("/api/processar").then(function (d) {
+      if (d.ok && !d.simulado) return toast("Terminal aberto com o Claude Code");
+      modal("Processar pedidos", [h("p", { text: (d.erro || "Abra o terminal e rode:") }), h("pre", { text: d.comando })]);
+    }).catch(function (e) { toast(e.message, true); });
+  });
+  $("tema").addEventListener("click", function () {
+    var escuro = document.documentElement.getAttribute("data-theme") === "dark" ||
+      (!document.documentElement.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+    var novo = escuro ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", novo);
+    try { localStorage.setItem("painel-tema", novo); } catch (e) {}
+  });
+  try { var t = localStorage.getItem("painel-tema"); if (t) document.documentElement.setAttribute("data-theme", t); } catch (e) {}
+  carregar(true); setInterval(carregar, 4000);
+})();
+</script>
+</body>
+</html>
